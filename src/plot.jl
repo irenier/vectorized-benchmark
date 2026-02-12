@@ -1,6 +1,6 @@
 using CSV, DataFrames, Plots
 
-df = CSV.read("results/results.csv", DataFrame)
+df = CSV.read("results/sumexp.csv", DataFrame; header=12)
 
 filter!(:name => n -> occursin("/", n), df)
 transform!(df, :name => ByRow(n -> begin
@@ -15,7 +15,7 @@ p = plot(
     group=df.method,
     markershape=:circle,
     markersize=4,
-    linewidth=2,
+    linewidth=1,
     xscale=:log10,
     yscale=:log10,
     xlabel="Size",
@@ -26,4 +26,4 @@ p = plot(
 )
 
 # 保存图片
-savefig(p, "results/benchmark.svg")
+savefig(p, "results/benchmark_sumexp.svg")

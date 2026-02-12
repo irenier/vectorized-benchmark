@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 4.2.0)
+cmake_minimum_required(VERSION 3.18.0)
 
 project(SIMD LANGUAGES CXX)
 
@@ -7,11 +7,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(FetchContent)
 
-FetchContent_Declare(
-    armadillo
-    GIT_REPOSITORY https://gitlab.com/conradsnicta/armadillo-code.git
-    GIT_TAG 15.2.x
-)
+# FetchContent_Declare(
+#     armadillo
+#     GIT_REPOSITORY https://gitlab.com/conradsnicta/armadillo-code.git
+#     GIT_TAG 15.2.x
+# )
 
 FetchContent_Declare(
     xsimd
@@ -25,7 +25,7 @@ FetchContent_Declare(
     GIT_TAG 1.3.0
 )
 
-FetchContent_MakeAvailable(armadillo highway xsimd)
+FetchContent_MakeAvailable(highway xsimd)
 find_package(OpenMP REQUIRED)
 find_package(TBB REQUIRED)
 find_package(benchmark REQUIRED)
@@ -34,15 +34,16 @@ find_package(Eigen3 REQUIRED)
 add_library(project_config INTERFACE)
 
 target_compile_options(project_config INTERFACE
-    -O3 
+    -O3
     -march=native
-    -Wall 
+    -Wall
     -Wextra
 )
 
-# target_include_directories(project_config INTERFACE
-#     $<$<PLATFORM_ID:Darwin>:$<BUILD_INTERFACE:/opt/homebrew/opt/libomp/include>>
-# )
+target_include_directories(project_config INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+    # $<$<PLATFORM_ID:Darwin>:$<BUILD_INTERFACE:/opt/homebrew/opt/libomp/include>>
+)
 
 target_link_libraries(project_config INTERFACE
     OpenMP::OpenMP_CXX
@@ -52,10 +53,14 @@ target_link_libraries(project_config INTERFACE
     Eigen3::Eigen
     # armadillo
     hwy
+    hwy_contrib
 )
 
 set(MAIN_SOURCES
-    src/main.cpp
+    src/bench_axpy.cpp
+    src/bench_dot.cpp
+    src/bench_nrm2.cpp
+    src/bench_sumexp.cpp
 )
 
 foreach(SOURCE_FILE IN LISTS MAIN_SOURCES)
