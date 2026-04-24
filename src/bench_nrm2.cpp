@@ -68,7 +68,7 @@ static void nrm2_omp(benchmark::State &state) {
 
   for (auto _ : state) {
     double sum = 0.0;
-#pragma omp parallel for reduction(+ : sum)
+#pragma omp parallel for simd reduction(+ : sum)
     for (size_t i = 0; i < n; ++i) {
       sum += x[i] * x[i];
     }
@@ -104,9 +104,9 @@ static void nrm2_std(benchmark::State &state) {
 
   for (auto _ : state) {
 
-    double sum =
-        std::transform_reduce(x.begin(), x.end(), 0.0, std::plus<double>(),
-                              [](double v) { return v * v; });
+    double sum = std::transform_reduce(std::execution::par_unseq, x.begin(),
+                                       x.end(), 0.0, std::plus<double>(),
+                                       [](double v) { return v * v; });
     double res = std::sqrt(sum);
     benchmark::DoNotOptimize(res);
   }

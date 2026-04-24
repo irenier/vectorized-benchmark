@@ -30,6 +30,6 @@ inline std::vector<double> generate_data(size_t n) {
 // 统一的 Benchmark 参数
 #define BENCH_ARGS                                                             \
   ->RangeMultiplier(10)                                                        \
-      ->Range(100, 1000000000)                                                 \
+      ->Range(100, 100000000)                                                 \
       ->Unit(benchmark::kNanosecond)                                           \
       ->Complexity()

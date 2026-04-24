@@ -2,7 +2,7 @@
 
 // AXPY: Y = alpha * X + Y
 
-double alpha = 2.5;
+const double alpha = 2.5;
 
 static void axpy_eigen(benchmark::State &state) {
   const size_t n = state.range(0);
@@ -61,7 +61,6 @@ static void axpy_xsimd(benchmark::State &state) {
     for (; i + inc <= n; i += inc) {
       auto vx = xsimd::load_unaligned(x.data() + i);
       auto vy = xsimd::load_unaligned(y.data() + i);
-      // xsimd::fma(a, b, c) -> a*b+c
       auto res = xsimd::fma(alpha_val, vx, vy);
       res.store_unaligned(y.data() + i);
     }
@@ -79,7 +78,7 @@ static void axpy_omp(benchmark::State &state) {
   auto y = generate_data(n);
 
   for (auto _ : state) {
-#pragma omp parallel for
+#pragma omp parallel for simd
     for (size_t i = 0; i < n; ++i) {
       y[i] += alpha * x[i];
     }
@@ -111,7 +110,8 @@ static void axpy_std(benchmark::State &state) {
   auto y = generate_data(n);
 
   for (auto _ : state) {
-    std::transform(y.begin(), y.end(), x.begin(), y.begin(),
+    std::transform(std::execution::par_unseq, y.begin(), y.end(), x.begin(),
+                   y.begin(),
                    [](double yi, double xi) { return yi + alpha * xi; });
     benchmark::DoNotOptimize(y.data());
   }

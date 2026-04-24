@@ -94,7 +94,7 @@ static void dot_omp(benchmark::State &state) {
 
   for (auto _ : state) {
     double res = 0.0;
-#pragma omp parallel for reduction(+ : res)
+#pragma omp parallel for simd reduction(+ : res)
     for (size_t i = 0; i < n; ++i) {
       res += x[i] * y[i];
     }
@@ -109,9 +109,9 @@ static void dot_std(benchmark::State &state) {
   auto y = generate_data(n);
 
   for (auto _ : state) {
-    double res =
-        std::transform_reduce(x.begin(), x.end(), y.begin(), 0.0, std::plus<>(),
-                              [](double a, double b) { return a * b; });
+    double res = std::transform_reduce(
+        std::execution::par_unseq, x.begin(), x.end(), y.begin(), 0.0,
+        std::plus<>(), [](double a, double b) { return a * b; });
     benchmark::DoNotOptimize(res);
   }
   state.SetComplexityN(n);

@@ -61,7 +61,7 @@ static void expsum_omp(benchmark::State &state) {
 
   for (auto _ : state) {
     double res = 0.0;
-#pragma omp parallel for reduction(+ : res)
+#pragma omp parallel for simd reduction(+ : res)
     for (size_t i = 0; i < n; ++i) {
       res += std::exp(data[i]);
     }
@@ -94,8 +94,8 @@ static void expsum_std(benchmark::State &state) {
   auto data = generate_data(n);
 
   for (auto _ : state) {
-    double res = std::transform_reduce(data.begin(), data.end(), 0.0,
-                                       std::plus<double>(),
+    double res = std::transform_reduce(std::execution::par_unseq, data.begin(),
+                                       data.end(), 0.0, std::plus<double>(),
                                        [](double x) { return std::exp(x); });
     benchmark::DoNotOptimize(res);
   }

@@ -17,12 +17,14 @@ FetchContent_Declare(
     xsimd
     GIT_REPOSITORY https://github.com/xtensor-stack/xsimd.git
     GIT_TAG 14.0.0
+    GIT_SHALLOW TRUE
 )
 
 FetchContent_Declare(
     highway
     GIT_REPOSITORY https://github.com/google/highway.git
-    GIT_TAG 1.3.0
+    GIT_TAG 1.4.0
+    GIT_SHALLOW TRUE
 )
 
 FetchContent_MakeAvailable(highway xsimd)
